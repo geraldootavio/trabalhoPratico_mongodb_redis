@@ -1,0 +1,149 @@
+# ==============================================================================
+# TRABALHO PRÁTICO - BANCO DE DADOS 2 (IFMG CAMPUS OURO PRETO)
+# CURSO: Análise e Desenvolvimento de Sistemas (ADS)
+# CENÁRIO: Congresso Acadêmico de ADS (CONADS 2026)
+# ARQUIVO: redis/comandos_redis.txt
+# OBJETIVO: Comandos Redis com estruturas obrigatórias e demonstração dos 2 fluxos
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# PADRÃO DE NOMENCLATURA DE CHAVES ADOTADO NO PROJETO:
+# - cache:vagas:atividade:<id>   -> String com TTL (Cache de vagas disponíveis)
+# - resumo:atividade:<id>        -> Hash (Resumo rápido para exibição sem carregar todo o Mongo)
+# - ranking:atividades:populares -> Sorted Set (Ranking de popularidade por inscrições/acessos)
+# - fila:espera:atividade:<id>   -> List (Fila de espera de alunos para oficinas esgotadas)
+# - sessao:participante:<id>     -> String com TTL (Sessão do aluno logado na aplicação)
+# ------------------------------------------------------------------------------
+
+
+# ==============================================================================
+# REQUISITO 1: STRING COM TTL (CACHE DE VAGAS E SESSÃO TEMPORÁRIA)
+# ==============================================================================
+
+# Criar cache de vagas para a atividade 101 com expiração (TTL) de 60 segundos
+SETEX cache:vagas:atividade:101 60 "15"
+
+# Consultar o valor armazenado no cache
+GET cache:vagas:atividade:101
+
+# Verificar o tempo restante de expiração em segundos (TTL)
+TTL cache:vagas:atividade:101
+
+# Exemplo de controle de sessão de participante com TTL de 300 segundos (5 minutos)
+SETEX sessao:participante:part_001 300 '{"nome":"Ana Silva","tipo":"Estudante ADS"}'
+GET sessao:participante:part_001
+TTL sessao:participante:part_001
+
+
+# ==============================================================================
+# REQUISITO 2: HASH (RESUMO RÁPIDO DE ENTIDADE)
+# Justificativa: Armazena atributos principais da atividade em memória para consulta ultrarrápida.
+# ==============================================================================
+
+# Gravar o resumo da atividade 'ativ_101' (Cross-Fire Docker vs Podman)
+HSET resumo:atividade:101 titulo "Cross-Fire: Docker vs Podman" tipo "Cross-fire" palestrante "Eng. Gabriel Torres" local "Auditório Master" vagas 15
+
+# Gravar o resumo da atividade 'ativ_103' (Oficina MongoDB)
+HSET resumo:atividade:103 titulo "Oficina Prática de MongoDB" tipo "Oficina" palestrante "Prof. Dr. Ricardo Oliveira" local "Lab 03" vagas 2
+
+# Gravar o resumo da atividade 'ativ_104' (Oficina Redis)
+HSET resumo:atividade:104 titulo "Oficina de Caching com Redis" tipo "Oficina" palestrante "Juliana Rocha" local "Lab 01" vagas 0
+
+# Consultar todos os campos do resumo de uma atividade
+HGETALL resumo:atividade:101
+
+# Consultar apenas um campo específico (ex: apenas o título ou palestrante)
+HGET resumo:atividade:101 titulo
+HGET resumo:atividade:101 palestrante
+
+
+# ==============================================================================
+# REQUISITO 3: SORTED SET (RANKING DE ATIVIDADES MAIS PROCURADAS)
+# Justificativa: Mantém em tempo real a pontuação (score = número de acessos/inscrições)
+# de cada atividade ordenada automaticamente pelo Redis.
+# ==============================================================================
+
+# Adicionar pontuações iniciais no ranking de atividades populares
+ZADD ranking:atividades:populares 120 "ativ_101 - Cross-Fire Docker vs Podman"
+ZADD ranking:atividades:populares 195 "ativ_102 - Cross-Fire React vs Vue"
+ZADD ranking:atividades:populares 250 "ativ_103 - Oficina Prática de MongoDB"
+ZADD ranking:atividades:populares 310 "ativ_104 - Oficina de Caching com Redis"
+ZADD ranking:atividades:populares 85  "ativ_105 - Palestra Futuro ADS"
+
+# Incrementar o ranking de uma atividade quando um aluno visualiza ou se inscreve
+ZINCRBY ranking:atividades:populares 1 "ativ_103 - Oficina Prática de MongoDB"
+
+# Obter o TOP 3 atividades mais populares (do maior para o menor com pontuação)
+ZREVRANGE ranking:atividades:populares 0 2 WITHSCORES
+
+# Obter todo o ranking ordenado por popularidade
+ZREVRANGE ranking:atividades:populares 0 -1 WITHSCORES
+
+
+# ==============================================================================
+# REQUISITO 4: LIST (FILA DE ESPERA DE PARTICIPANTES EM ATIVIDADES ESGOTADAS)
+# Justificativa: Estrutura FIFO (First-In, First-Out) para garantir a ordem de chegada
+# dos alunos quando as vagas de uma oficina acabarem.
+# ==============================================================================
+
+# Adicionar participantes na fila de espera da Oficina de Redis (ativ_104) que está esgotada
+RPUSH fila:espera:atividade:104 "part_002 - Carlos Santos"
+RPUSH fila:espera:atividade:104 "part_004 - Beatriz Lima"
+RPUSH fila:espera:atividade:104 "part_007 - Lucas Pereira"
+
+# Consultar o número de pessoas aguardando na fila de espera
+LLEN fila:espera:atividade:104
+
+# Visualizar todos os alunos na fila sem remover
+LRANGE fila:espera:atividade:104 0 -1
+
+# Quando uma vaga é liberada, chama o próximo da fila (FIFO - remove do início)
+LPOP fila:espera:atividade:104
+
+
+# ==============================================================================
+# DEMONSTRAÇÃO DO FLUXO 1: FLUXO COMPLETO DE CACHE (MISS -> MONGO -> REDIS -> HIT)
+# ==============================================================================
+
+# PASSO 1: Consultar a chave no Redis (primeira vez - chave não existe)
+GET cache:vagas:atividade:107
+# RESULTADO ESPERADO: (nil)  <-- ESTA CARACTERIZADO O CACHE MISS!
+
+# PASSO 2: Como deu CACHE MISS, a aplicação consulta no MongoDB permanente:
+# db.atividades.findOne({ _id: "ativ_107" })
+# Retorna: vagas_disponiveis = 22
+
+# PASSO 3: Salva a resposta no Redis com tempo de expiração (TTL de 60 segundos)
+SETEX cache:vagas:atividade:107 60 "22"
+
+# PASSO 4: Consultar novamente a chave no Redis (segunda vez)
+GET cache:vagas:atividade:107
+# RESULTADO ESPERADO: "22"  <-- ESTA CARACTERIZADO O CACHE HIT! (ultra-rápido, sem ir ao Mongo)
+
+# PASSO 5: Verificar o tempo restante de vida do cache
+TTL cache:vagas:atividade:107
+# RESULTADO ESPERADO: Exemplo: 54 (segundos restantes)
+
+
+# ==============================================================================
+# DEMONSTRAÇÃO DO FLUXO 2: SEGUNDO FLUXO CONJUNTO (INSCRIÇÃO + FILA + RANKING)
+# ==============================================================================
+
+# Cenário: Participante 'part_005' tenta se inscrever na Oficina de Redis ('ativ_104').
+# A aplicação verifica que vagas_disponiveis == 0 no MongoDB.
+
+# 1. Registrar a intenção de vaga na Fila de Espera FIFO do Redis:
+RPUSH fila:espera:atividade:104 "part_005 - Fernando Souza"
+
+# 2. Incrementar a popularidade da atividade no Ranking Redis:
+ZINCRBY ranking:atividades:populares 5 "ativ_104 - Oficina de Caching com Redis"
+
+# 3. Invalidar o cache de vagas antigo para forçar atualização no próximo acesso:
+DEL cache:vagas:atividade:104
+
+# 4. Conferir a fila atualizada no Redis:
+LRANGE fila:espera:atividade:104 0 -1
+
+# ------------------------------------------------------------------------------
+# FIM DOS COMANDOS REDIS
+# ------------------------------------------------------------------------------

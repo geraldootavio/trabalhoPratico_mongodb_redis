@@ -1,0 +1,18 @@
+# Executáveis locais e bancos temporários
+mongodb-bin/
+mongodb-data/
+mongodb.zip
+php_mongodb.zip
+php_mongodb_extracted/
+redis-bin/
+
+# Dependências do Composer (geradas via composer install)
+php/vendor/
+php/composer.phar
+
+# Arquivos do Sistema Operacional e IDEs
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
