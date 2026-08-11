@@ -1,7 +1,7 @@
 # 🎓 Trabalho Prático - Banco de Dados 2 (MongoDB e Redis)
 **Instituto Federal de Minas Gerais (IFMG) - Campus Ouro Preto**  
 **Curso:** Análise e Desenvolvimento de Sistemas (ADS)  
-**Disciplina:** Banco de Dados 2 (Prof. Dr. Ricardo Oliveira)  
+**Disciplina:** Banco de Dados 2  
 **Cenário Escolhido:** Evento Acadêmico - Congresso de Análise e Desenvolvimento de Sistemas (CONADS 2026)
 
 ---
