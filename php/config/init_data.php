@@ -138,15 +138,39 @@ $mongo->atividades->insertMany([
 
 // 5. Se o Redis estiver ativo, inicializa estruturas
 if ($redis) {
+    try {
+        // Limpa chaves anteriores no Redis
+        $redis->del([
+            'cache:vagas:atividade:101',
+            'cache:vagas:atividade:102',
+            'cache:vagas:atividade:103',
+            'cache:vagas:atividade:104',
+            'resumo:atividade:101',
+            'resumo:atividade:102',
+            'resumo:atividade:103',
+            'resumo:atividade:104',
+            'ranking:atividades:populares',
+            'fila:espera:atividade:104'
+        ]);
+    } catch (\Exception $e) {}
+
     // String com TTL
     $redis->setex('cache:vagas:atividade:101', 60, "15");
     
-    // Hash
+    // Hashes de Resumo
     $redis->hset('resumo:atividade:101', 'titulo', 'Cross-Fire: Docker vs Podman');
     $redis->hset('resumo:atividade:101', 'tipo', 'Cross-fire');
     $redis->hset('resumo:atividade:101', 'palestrante', 'Eng. Gabriel Torres');
 
-    // Sorted Set (Ranking)
+    $redis->hset('resumo:atividade:103', 'titulo', 'Oficina Prática de MongoDB');
+    $redis->hset('resumo:atividade:103', 'tipo', 'Oficina');
+    $redis->hset('resumo:atividade:103', 'palestrante', 'Prof. Dr. Ricardo Oliveira');
+
+    $redis->hset('resumo:atividade:104', 'titulo', 'Oficina de Caching com Redis');
+    $redis->hset('resumo:atividade:104', 'tipo', 'Oficina');
+    $redis->hset('resumo:atividade:104', 'palestrante', 'Juliana Rocha');
+
+    // Sorted Set (Ranking de Popularidade)
     $redis->zadd('ranking:atividades:populares', [
         'ativ_104 - Oficina de Caching com Redis' => 310,
         'ativ_103 - Oficina Prática de MongoDB' => 250,
@@ -154,9 +178,10 @@ if ($redis) {
         'ativ_101 - Cross-Fire Docker vs Podman' => 120
     ]);
 
-    // List (Fila de espera)
+    // List (Fila FIFO de Espera)
     $redis->rpush('fila:espera:atividade:104', 'part_002 - Carlos Santos');
     $redis->rpush('fila:espera:atividade:104', 'part_004 - Beatriz Lima');
 }
 
-echo "✅ Dados iniciais populados com sucesso no MongoDB e Redis!";
+echo "✅ Dados iniciais populados com sucesso no MongoDB " . (strpos(getenv('MONGO_URI') ?: '', 'mongodb+srv://') !== false ? "(Atlas Cloud ☁️)" : "(Local 🖥️)") . ($redis ? " e Redis ⚡!" : "!");
+

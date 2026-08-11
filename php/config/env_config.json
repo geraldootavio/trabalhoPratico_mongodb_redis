@@ -1,0 +1,8 @@
+{
+    "MONGO_URI": "mongodb+srv://geraldo_otavio:geraldo1230@cluster0.svb1hq4.mongodb.net/congresso_ads?retryWrites=true&w=majority&appName=Cluster0",
+    "MONGO_DB_NAME": "congresso_ads",
+    "REDIS_URI": "redis://default:qh9g1YOXEDLtxjuHRvO4xJdWqrVXfrSu@hole-passionate-wire-85479.db.redis.io:14891",
+    "REDIS_HOST": "hole-passionate-wire-85479.db.redis.io",
+    "REDIS_PORT": "14891",
+    "REDIS_PASSWORD": "qh9g1YOXEDLtxjuHRvO4xJdWqrVXfrSu"
+}

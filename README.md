@@ -95,15 +95,19 @@ Abra o terminal do Redis para testar os comandos e fluxos de cache:
 redis-cli < redis/comandos_redis.txt
 ```
 
-### Passo 3: Executar a Aplicação Web em PHP (Desafio Opcional)
-Se você possui o PHP instalado localmente, inicie o servidor embutido na pasta `php/public`:
+### Passo 3: Executar a Aplicação Web em PHP & Conectar ao MongoDB Atlas
+1. Inicie o servidor embutido do PHP na pasta `php/public`:
 ```bash
 cd php/public
 php -S localhost:8000
 ```
-Acesse no navegador: `http://localhost:8000`
+2. Acesse no navegador: `http://localhost:8000`
+3. Acesse a aba **⚡ Conexão NoSQL** (`http://localhost:8000/conexao.php`) para:
+   - Configurar sua **String de Conexão do MongoDB Atlas** (`mongodb+srv://...`).
+   - Configurar o **Redis** (local ou cloud via URI/Host).
+   - Testar a latência em tempo real e inicializar/popular os dados com 1 clique!
 
-> **Dica:** Se preferir popular o banco direto pela Web, acesse `http://localhost:8000/../config/init_data.php`.
+> **Alternativa via `.env`:** Você também pode editar o arquivo `php/.env` e definir a variável `MONGO_URI` com a URI do seu cluster no MongoDB Atlas.
 
 ---
 
