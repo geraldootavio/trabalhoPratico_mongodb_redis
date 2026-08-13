@@ -2,7 +2,8 @@
 **Instituto Federal de Minas Gerais (IFMG) - Campus Ouro Preto**  
 **Curso:** Análise e Desenvolvimento de Sistemas (ADS)  
 **Disciplina:** Banco de Dados 2  
-**Professor:** Dr. Ricardo Oliveira  
+**Alunos:** Alessandro Oliveira de Jesus; Geraldo Otávio Figueiredo Pereira
+**Professor:** João Paulo Fernandes de Cerqueira César
 
 ---
 
@@ -18,8 +19,8 @@ O evento conta com centenas de estudantes e profissionais inscritos em atividade
 - **Cross-Fire:** Painéis de discussão técnica e comparação direta entre ferramentas de desenvolvimento (ex: Docker vs Podman, React vs Vue vs Angular, MongoDB vs PostgreSQL).
 
 ### Necessidade de Dados e Divisão de Responsabilidades:
-1. **MongoDB (Armazenamento Permanente e Estruturado):** Guardar com segurança o cadastro completo de eventos, participantes, atividades e o histórico oficial de inscrições. Responsável por pesquisas complexas, filtros e agregações estatísticas.
-2. **Redis (Armazenamento Temporário de Alta Velocidade):** Resolver gargalos de performance em horários de pico. Gerenciar cache de vagas com expiração (TTL), resumos em memória (Hashes), ranking de popularidade das atividades (Sorted Sets) e filas de espera ordenadas por ordem de chegada (Lists) para oficinas esgotadas.
+1. **MongoDB (Armazenamento Permanente e Estruturado):** Guardar com segurança o cadastro completo de eventos, participantes, atividades e o histórico oficial de inscrições. Responsável por pesquisas complexas, filtros e agregações estatísticas. Funciona tanto via contêiner Docker local quanto via cluster na nuvem (**MongoDB Atlas Cloud**).
+2. **Redis (Armazenamento Temporário de Alta Velocidade):** Resolver gargalos de performance em horários de pico. Gerenciar cache de vagas com expiração (TTL), resumos em memória (Hashes), ranking de popularidade das atividades (Sorted Sets) e filas de espera ordenadas por ordem de chegada (Lists) para oficinas esgotadas. Funciona tanto localmente quanto em instância na nuvem (**Redis Cloud**).
 
 ---
 
@@ -164,9 +165,9 @@ sequenceDiagram
 
 | Integrante | Atividades Realizadas |
 | :--- | :--- |
-| **Estudante 1** | Modelagem das coleções no Mongo, criação do script de dados (`01_dados.js`), índices e Pipeline de Agregação. |
-| **Estudante 2** | Modelagem do Redis, criação dos comandos (`comandos_redis.txt`), testes de TTL, Sorted Set e Fila FIFO. |
-| **Estudante 3** | Desenvolvimento da aplicação Web em PHP, criação do CSS responsive, relatórios e README. |
+| **Estudante 1 - Geraldo** | Modelagem das coleções no Mongo, criação do script de dados (`01_dados.js`), índices e Pipeline de Agregação. |
+| **Estudante 2 - Alessandro** | Modelagem do Redis, criação dos comandos (`comandos_redis.txt`), testes de TTL, Sorted Set e Fila FIFO. |
+| **Estudante 3 - Alessandro e Geraldo** | Desenvolvimento da aplicação Web em PHP, criação do CSS responsive, relatórios e README. |
 
 ---
 

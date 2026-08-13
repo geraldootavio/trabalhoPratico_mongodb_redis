@@ -3,6 +3,9 @@
 **Curso:** Análise e Desenvolvimento de Sistemas (ADS)  
 **Disciplina:** Banco de Dados 2  
 **Cenário Escolhido:** Evento Acadêmico - Congresso de Análise e Desenvolvimento de Sistemas (CONADS 2026)
+**Alunos:** Alessandro Oliveira de Jesus; Geraldo Otávio Figueiredo Pereira
+**Professor:** João Paulo Fernandes de Cerqueira César
+
 
 ---
 
@@ -16,18 +19,17 @@ Além dos scripts de bancos de dados exigidos no trabalho principal, o projeto i
 
 ## 👥 2. Integrantes do Grupo e Divisão de Tarefas
 
-- **Estudante 1:** Modelagem NoSQL no MongoDB, elaboração de documentos embutidos/referências, criação dos scripts de carga (`01_dados.js`) e índice.
-- **Estudante 2:** Definição da arquitetura no Redis, padrões de chaves, comandos CLI (`comandos_redis.txt`), fluxos de Cache (TTL) e Ranking.
-- **Estudante 3:** Desenvolvimento da aplicação Web em PHP, integração dos drivers MongoDB/Redis, interface visual e relatório final.
+- **Estudante 1: Geraldo** Modelagem NoSQL no MongoDB, elaboração de documentos embutidos/referências, criação dos scripts de carga (`01_dados.js`) e índice. Integração dos drivers MongoDB/Redis. Relatório final.
+- **Estudante 2: Alessandro** Definição da arquitetura no Redis, padrões de chaves, comandos CLI (`comandos_redis.txt`), fluxos de Cache (TTL) e Ranking. Desenvolvimento da aplicação Web em PHP, integração dos drivers MongoDB/Redis, interface visual.
 
 ---
 
 ## 🛠️ 3. Ferramentas e Tecnologias Utilizadas
 
-- **MongoDB & mongosh:** Banco NoSQL orientado a documentos (Porta 27017).
-- **Redis & redis-cli:** Banco NoSQL chave-valor em memória (Porta 6379).
-- **PHP 7.4+ ou 8.x:** Linguagem para o protótipo web.
-- **Composer (Opcional):** Gerenciador de dependências PHP (pacotes `mongodb/mongodb` e `predis/predis`).
+- **MongoDB & mongosh:** Banco NoSQL orientado a documentos (Local ou MongoDB Atlas Cloud).
+- **Redis & redis-cli:** Banco NoSQL chave-valor em memória (Local ou Redis Cloud).
+- **PHP 8.x (XAMPP):** Linguagem para o protótipo web com extensoes `zip` e `mongodb`.
+- **Composer:** Gerenciador de dependências PHP (`mongodb/mongodb` e `predis/predis`).
 
 ---
 
@@ -37,15 +39,18 @@ Além dos scripts de bancos de dados exigidos no trabalho principal, o projeto i
 grupo_01_trabalho_bd2/
 ├── README.md                           # Guia completo de instalação e execução
 ├── RELATORIO.md                        # Relatório técnico completo (Pronto para exportar PDF)
+├── docker-compose.yml                  # Docker para subir MongoDB e Redis localmente
 ├── mongodb/
 │   ├── 01_dados.js                     # Script de criação e carga inicial (+20 documentos)
 │   └── 02_operacoes.js                 # CRUD, 4+ consultas, Aggregation Pipeline e Índice
 ├── redis/
 │   └── comandos_redis.txt              # Comandos Redis (String TTL, Hash, ZSET e List)
 └── php/
+    ├── composer.phar                   # Gerenciador de dependências Composer executável
     ├── config/
     │   ├── database.php                # Conexão transparente com MongoDB e Redis
-    │   └── init_data.php               # Script auxiliar em PHP para inicializar dados via web
+    │   ├── env_config.json             # Configuração de URIs (MongoDB Atlas Cloud & Redis Cloud)
+    │   └── init_data.php               # Script auxiliar em PHP para inicializar dados automaticamente
     ├── includes/
     │   ├── header.php                  # Barra de navegação e layout CSS
     │   └── footer.php                  # Rodapé padrão
@@ -79,35 +84,47 @@ grupo_01_trabalho_bd2/
 
 ## 🚀 6. Ordem de Execução e Passo a Passo
 
-### Passo 1: Executar o MongoDB (`mongosh`)
-Abra o terminal e execute os scripts de carga e operações:
-```bash
-# 1. Carregar os dados iniciais (+20 documentos)
-mongosh < mongodb/01_dados.js
+### Passo 1: Subir os Bancos de Dados (Duas Opções)
 
-# 2. Executar as consultas, CRUD, Aggregation Pipeline e criar o Índice
-mongosh < mongodb/02_operacoes.js
+#### Opção A: MongoDB Atlas + Redis Cloud (Já pré-configurado no `env_config.json`)
+A aplicação se conecta diretamente à nuvem sem precisar instalar contêineres locais.
+
+#### Opção B: Docker Local
+Abra o Docker Desktop e rode na raiz do projeto:
+```bash
+docker compose up -d
 ```
 
-### Passo 2: Executar o Redis (`redis-cli`)
-Abra o terminal do Redis para testar os comandos e fluxos de cache:
-```bash
-redis-cli < redis/comandos_redis.txt
-```
+---
 
-### Passo 3: Executar a Aplicação Web em PHP & Conectar ao MongoDB Atlas
-1. Inicie o servidor embutido do PHP na pasta `php/public`:
-```bash
+### Passo 2: Executar a Aplicação Web em PHP
+1. No terminal do PowerShell, entre na pasta `php/public`:
+```powershell
 cd php/public
-php -S localhost:8000
 ```
-2. Acesse no navegador: `http://localhost:8000`
-3. Acesse a aba **⚡ Conexão NoSQL** (`http://localhost:8000/conexao.php`) para:
-   - Configurar sua **String de Conexão do MongoDB Atlas** (`mongodb+srv://...`).
-   - Configurar o **Redis** (local ou cloud via URI/Host).
-   - Testar a latência em tempo real e inicializar/popular os dados com 1 clique!
 
-> **Alternativa via `.env`:** Você também pode editar o arquivo `php/.env` e definir a variável `MONGO_URI` com a URI do seu cluster no MongoDB Atlas.
+2. Inicie o servidor embutido do PHP (utilizando a instalação do XAMPP):
+```powershell
+C:\xampp\php\php.exe -S localhost:8000
+```
+> **Nota:** Se o parâmetro `php` já estiver configurado no PATH do seu sistema, você pode rodar simplesmente `php -S localhost:8000`.
+
+3. Acesse no navegador: **`http://localhost:8000`**
+
+---
+
+### Passo 3: Executar Scripts CLI (Mongosh / Redis CLI) - Opcional
+
+* **MongoDB (`mongosh`):**
+  ```bash
+  mongosh < mongodb/01_dados.js
+  mongosh < mongodb/02_operacoes.js
+  ```
+
+* **Redis (`redis-cli`):**
+  ```bash
+  redis-cli < redis/comandos_redis.txt
+  ```
 
 ---
 

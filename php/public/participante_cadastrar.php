@@ -130,7 +130,7 @@ if ($mongoDb) {
             </div>
 
             <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.85rem; margin-top: 0.5rem;">
-                ✍️ Concluir Credenciamento
+                 Concluir Credenciamento
             </button>
         </form>
     </div>
