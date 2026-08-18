@@ -518,6 +518,142 @@ require_once __DIR__ . '/../config/database.php';
             align-items: center;
             gap: 0.4rem;
         }
+        /* Estilos Responsivos & Dispositivos Móveis */
+        .menu-toggle {
+            display: none;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 1.3rem;
+            padding: 0.4rem 0.75rem;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .menu-toggle:hover, .menu-toggle:focus {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        @media (max-width: 868px) {
+            .topbar-info {
+                gap: 0.75rem;
+                font-size: 0.75rem;
+            }
+
+            .topbar-container {
+                justify-content: center;
+            }
+
+            .header-container {
+                padding: 0.75rem 1rem;
+            }
+
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            nav {
+                width: 100%;
+            }
+
+            .nav-menu {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                gap: 0.4rem;
+                padding-top: 0.8rem;
+                margin-top: 0.8rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .nav-menu.open {
+                display: flex !important;
+            }
+
+            nav a {
+                width: 100%;
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr !important;
+                gap: 1.25rem !important;
+            }
+
+            .hero-banner {
+                padding: 1.5rem 1.2rem !important;
+                margin-bottom: 1.25rem !important;
+            }
+
+            .hero-title {
+                font-size: 1.45rem !important;
+            }
+
+            .hero-desc {
+                font-size: 0.9rem !important;
+                margin-bottom: 1rem !important;
+            }
+
+            .hero-metrics {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.65rem !important;
+            }
+
+            .metric-box {
+                padding: 0.75rem 0.85rem !important;
+            }
+
+            .metric-value {
+                font-size: 1.35rem !important;
+            }
+
+            .card {
+                padding: 1.25rem !important;
+                margin-bottom: 1.25rem !important;
+            }
+
+            main {
+                padding: 0 1rem !important;
+                margin: 1.25rem auto !important;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .form-control {
+                font-size: 16px !important; /* Previne auto-zoom no Safari iOS */
+            }
+
+            .table-responsive {
+                -webkit-overflow-scrolling: touch;
+            }
+
+            th, td {
+                padding: 0.75rem 0.65rem !important;
+                font-size: 0.82rem !important;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-metrics {
+                grid-template-columns: 1fr !important;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .topbar {
+                display: none; /* Esconde a topbar em telas super pequenas para poupar espaço vertical */
+            }
+        }
     </style>
 </head>
 <body>
@@ -543,7 +679,7 @@ require_once __DIR__ . '/../config/database.php';
 
     <!-- Navegação Principal -->
     <header>
-        <div class="header-container">
+        <div class="header-container" style="flex-wrap: wrap;">
             <a href="index.php" class="brand-link">
                 <div class="brand-logo">🎓</div>
                 <div class="brand-text-wrapper">
@@ -551,12 +687,16 @@ require_once __DIR__ . '/../config/database.php';
                     <span class="brand-sub">I Congresso Nacional de ADS</span>
                 </div>
             </a>
+
+            <button class="menu-toggle" id="mobileMenuBtn" aria-label="Abrir Menu de Navegação">
+                <span>☰</span>
+            </button>
             
             <?php
             $currentPage = basename($_SERVER['PHP_SELF']);
             ?>
             <nav>
-                <ul>
+                <ul class="nav-menu" id="navMenu">
                     <li>
                         <a href="index.php" class="<?= $currentPage === 'index.php' ? 'active' : '' ?>">
                             <span>🏠</span> Início
@@ -581,6 +721,21 @@ require_once __DIR__ . '/../config/database.php';
             </nav>
         </div>
     </header>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var btn = document.getElementById('mobileMenuBtn');
+            var menu = document.getElementById('navMenu');
+            if (btn && menu) {
+                btn.addEventListener('click', function() {
+                    menu.classList.toggle('open');
+                    var isExpanded = menu.classList.contains('open');
+                    btn.setAttribute('aria-expanded', isExpanded);
+                    btn.innerHTML = isExpanded ? '<span>✕</span>' : '<span>☰</span>';
+                });
+            }
+        });
+    </script>
 
     <main>
         <?php if (isset($_SESSION['mensagem_sucesso'])): ?>
